@@ -187,12 +187,12 @@ window.addEventListener('DOMContentLoaded', function () {
 
 		if (!res.ok) {
 			throw new Error(`Could not fetch ${url}, status: ${res.status}`);
-		} 
+		}
 
 		return await res.json();
 	};
 
-	
+
 
 	// 1-й Прием как мы можем динамический выводить данные на фронт с сервера
 
@@ -216,23 +216,29 @@ window.addEventListener('DOMContentLoaded', function () {
 
 	// 		element.innerHTML = `
 	// 		<img src=${img} alt=${altimg}>
-    //             <h3 class="menu__item-subtitle">${title}</h3>
-    //             <div class="menu__item-descr">${descr}</div>
-    //             <div class="menu__item-divider"></div>
-    //             <div class="menu__item-price">
-    //                 <div class="menu__item-cost">Цена:</div>
-    //                 <div class="menu__item-total"><span>${price}</span> грн/день</div>
-    //             </div>
+	//             <h3 class="menu__item-subtitle">${title}</h3>
+	//             <div class="menu__item-descr">${descr}</div>
+	//             <div class="menu__item-divider"></div>
+	//             <div class="menu__item-price">
+	//                 <div class="menu__item-cost">Цена:</div>
+	//                 <div class="menu__item-total"><span>${price}</span> грн/день</div>
+	//             </div>
 	// 		`;
 
 	// 		document.querySelector('.menu .container').append(element);
 	// 	});
 	// }
-	
+
 	axios.get('http://localhost:3000/menu')
 		.then(data => {
-			data.data.forEach(({img, altimg, title, descr, price}) => {
-				new MenuCard(img,altimg,title,descr,price, '.menu .container').render();
+			data.data.forEach(({
+				img,
+				altimg,
+				title,
+				descr,
+				price
+			}) => {
+				new MenuCard(img, altimg, title, descr, price, '.menu .container').render();
 			});
 		});
 
@@ -277,7 +283,7 @@ window.addEventListener('DOMContentLoaded', function () {
 
 			const json = JSON.stringify(Object.fromEntries(formData.entries()));
 
-				postData('http://localhost:3000/requests', json)
+			postData('http://localhost:3000/requests', json)
 				.then(data => {
 					console.log(data);
 					showThanksModal(message.success);
@@ -392,7 +398,7 @@ window.addEventListener('DOMContentLoaded', function () {
 	}
 
 	function deleteNotDigits(srt) {
-		return + srt.replace(/\D/g, '');
+		return +srt.replace(/\D/g, '');
 	}
 
 	next.addEventListener('click', () => {
@@ -407,9 +413,9 @@ window.addEventListener('DOMContentLoaded', function () {
 		if (slideIndex == slides.length) {
 			slideIndex = 1;
 		} else {
-			slideIndex ++;
+			slideIndex++;
 		}
-		
+
 		if (slides.length < 10) {
 			current.textContent = `0${slideIndex}`;
 		} else {
@@ -422,7 +428,7 @@ window.addEventListener('DOMContentLoaded', function () {
 
 	prev.addEventListener('click', () => {
 		if (offset == 0) {
-			offset =  deleteNotDigits(width) * (slides.length - 1);
+			offset = deleteNotDigits(width) * (slides.length - 1);
 		} else {
 			offset -= deleteNotDigits(width);
 		}
@@ -432,7 +438,7 @@ window.addEventListener('DOMContentLoaded', function () {
 		if (slideIndex == 1) {
 			slideIndex = slides.length;
 		} else {
-			slideIndex --;
+			slideIndex--;
 		}
 
 		if (slides.length < 10) {
@@ -464,4 +470,75 @@ window.addEventListener('DOMContentLoaded', function () {
 			dots[slideIndex - 1].style.opacity = 1;
 		});
 	});
+
+	// Calc
+
+	const result = document.querySelector('.calculating__result span');
+	let sex = 'female',
+	height, weight, age,
+	ratio = 1.375;
+
+	function calcTotal() {
+		if (!sex || !height || !weight || !age || !ratio) {
+			result.textContent = '____';
+			return;
+		}
+
+		if (sex === 'female') {
+			result.textContent = Math.round((447.6 + (9.2 * weight) + (3.1 * height) - (4.3 * age)) * ratio);
+		} else {
+			result.textContent = Math.round((88.36 + (13.4 * weight) + (4.8 * height) - (5.7 * age)) * ratio);
+		}
+	};
+
+	calcTotal();
+
+	function getStaticInformation(parentSelector, activeClass) {
+		const elements = document.querySelectorAll(`${parentSelector} div`);
+
+		elements.forEach(elem => {
+			elem.addEventListener('click', (e) => {
+				if (e.target.getAttribute('data-ratio')) {
+					ratio = +e.target.getAttribute('data-ratio');
+				} else {
+					sex = e.target.getAttribute('id');
+				}
+
+				elements.forEach(elem => {
+					elem.classList.remove(activeClass);
+				});
+				e.target.classList.add(activeClass);
+
+				calcTotal();
+			});
+		});
+	}
+
+	getStaticInformation('#gender', 'calculating__choose-item_active');
+	getStaticInformation('.calculating__choose_big', 'calculating__choose-item_active');
+
+	function getDynamicInformation(selector) {
+		const input = document.querySelector(selector);
+
+		input.addEventListener('input', () => {
+			switch (input.getAttribute('id')) {
+				case 'height':
+					height = +input.value;
+					break
+				case 'weight':
+					weight = +input.value;
+					break
+				case 'age':
+					age = +input.value;
+					break
+			}
+
+			calcTotal();
+		});
+	};
+
+	getDynamicInformation('#height');
+	getDynamicInformation('#weight');
+	getDynamicInformation('#age');
+
 });
