@@ -1,3 +1,5 @@
+import {getResource} from '../services/services';
+
 function cards () {
   // Используем классы для создание карточек меню
 
@@ -42,26 +44,14 @@ function cards () {
 		}
 	}
 
-	const getResource = async (url) => {
-		const res = await fetch(url);
-
-		if (!res.ok) {
-			throw new Error(`Could not fetch ${url}, status: ${res.status}`);
-		}
-
-		return await res.json();
-	};
-
-
-
 	// 1-й Прием как мы можем динамический выводить данные на фронт с сервера
 
-	// getResource('http://localhost:3000/menu')
-	// .then(data => {
-	// 	data.forEach(({img, altimg, title, descr, price}) => {
-	// 		new MenuCard(img, altimg, title, descr, price, '.menu .container').render();
-	// 	});
-	// });
+	getResource('http://localhost:3000/menu')
+	.then(data => {
+		data.forEach(({img, altimg, title, descr, price}) => {
+			new MenuCard(img, altimg, title, descr, price, '.menu .container').render();
+		});
+	});
 
 	// 2-й Прием как можно динамический вывести данные на фронт с сервера
 
@@ -89,17 +79,18 @@ function cards () {
 	// 	});
 	// }
 
-	axios.get('http://localhost:3000/menu')
-		.then(data => {
-			data.data.forEach(({
-				img,
-				altimg,
-				title,
-				descr,
-				price
-			}) => {
-				new MenuCard(img, altimg, title, descr, price, '.menu .container').render();
-			});
-		});
+	// axios.get('http://localhost:3000/menu')
+	// 	.then(data => {
+	// 		data.data.forEach(({
+	// 			img,
+	// 			altimg,
+	// 			title,
+	// 			descr,
+	// 			price
+	// 		}) => {
+	// 			new MenuCard(img, altimg, title, descr, price, '.menu .container').render();
+	// 		});
+	// 	});
+
 }
-module.exports = cards;
+export default cards;
